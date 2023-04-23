@@ -3,7 +3,10 @@ import { StyleSheet, Image, Dimensions } from 'react-native';
 import Swiper from 'react-native-swiper';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { PinchGestureHandler } from 'react-native-gesture-handler';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/Ionicons';
+
+Ionicons.loadFont().then();
 
 const { width, height } = Dimensions.get('window');
 
@@ -539,8 +542,8 @@ const data = [
                 <View style={styles.slide} key={index}>
                   <Image
                     source={item.image}
-                    style={{ ...styles.image, width: scale * width, height: scale * height }}
-                    resizeMode="cover"
+                    style={{ ...styles.image, width: '100%', height: '100%' }}
+                    resizeMode="contain"
                   />
                 </View>
               ))}
