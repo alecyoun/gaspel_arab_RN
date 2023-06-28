@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>ImageMusicApp2.ipa</key>
+	<array>
+		<dict>
+			<key>architectures</key>
+			<array>
+				<string>arm64</string>
+			</array>
+			<key>bitcode</key>
+			<false/>
+			<key>buildNumber</key>
+			<string>1</string>
+			<key>certificate</key>
+			<dict>
+				<key>SHA1</key>
+				<string>364DF94AFB45DA291D62D5218A8C7FCC9184B586</string>
+				<key>dateExpires</key>
+				<string>2024/06/14</string>
+				<key>type</key>
+				<string>Cloud Managed Apple Distribution</string>
+			</dict>
+			<key>embeddedBinaries</key>
+			<array>
+				<dict>
+					<key>architectures</key>
+					<array>
+						<string>arm64</string>
+					</array>
+					<key>bitcode</key>
+					<false/>
+					<key>buildNumber</key>
+					<string>1</string>
+					<key>certificate</key>
+					<dict>
+						<key>SHA1</key>
+						<string>364DF94AFB45DA291D62D5218A8C7FCC9184B586</string>
+						<key>dateExpires</key>
+						<string>2024/06/14</string>
+						<key>type</key>
+						<string>Cloud Managed Apple Distribution</string>
+					</dict>
+					<key>name</key>
+					<string>hermes.framework</string>
+					<key>symbols</key>
+					<true/>
+					<key>team</key>
+					<dict>
+						<key>id</key>
+						<string>U5X5MLZHTS</string>
+						<key>name</key>
+						<string>JI HYUN YOUN</string>
+					</dict>
+					<key>versionNumber</key>
+					<string>1.0</string>
+				</dict>
+			</array>
+			<key>entitlements</key>
+			<dict>
+				<key>application-identifier</key>
+				<string>U5X5MLZHTS.org.reactjs.native.example.ImageMusicApp2</string>
+				<key>beta-reports-active</key>
+				<true/>
+				<key>com.apple.developer.team-identifier</key>
+				<string>U5X5MLZHTS</string>
+				<key>get-task-allow</key>
+				<false/>
+			</dict>
+			<key>name</key>
+			<string>ImageMusicApp2.app</string>
+			<key>profile</key>
+			<dict>
+				<key>UUID</key>
+				<string>f3656c72-b0c0-4fb6-8534-4c77cd0be3c2</string>
+				<key>dateExpires</key>
+				<string>2024/06/14</string>
+				<key>name</key>
+				<string>iOS Team Store Provisioning Profile: org.reactjs.native.example.ImageMusicApp2</string>
+			</dict>
+			<key>symbols</key>
+			<true/>
+			<key>team</key>
+			<dict>
+				<key>id</key>
+				<string>U5X5MLZHTS</string>
+				<key>name</key>
+				<string>JI HYUN YOUN</string>
+			</dict>
+			<key>versionNumber</key>
+			<string>1.0</string>
+		</dict>
+	</array>
+</dict>
+</plist>
