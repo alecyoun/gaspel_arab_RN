@@ -526,7 +526,6 @@ const data = [
           <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
             <Icon name="times" size={25} color="#fff" />
           </TouchableOpacity>
-          <Text style={styles.title}>{data[index].title}</Text>
         </View>
         <PinchGestureHandler onGestureEvent={onPinchGestureEvent} onHandlerStateChange={onPinchHandlerStateChange}>
           <View style={styles.imageContainer}>
