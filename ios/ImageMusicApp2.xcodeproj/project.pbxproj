@@ -190,7 +190,7 @@
 			dependencies = (
 			);
 			name = ImageMusicApp2;
-			productName = ImageMusicApp2;
+			productName = HosannaHymnbook;
 			productReference = 13B07F961A680F5B00A75B9A /* ImageMusicApp2.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -221,9 +221,6 @@
 				Base,
 			);
 			mainGroup = 83CBB9F61A601CBA00E9B192;
-			packageReferences = (
-				862656C429F57ED800AA1F0D /* XCRemoteSwiftPackageReference "yoga.git" */,
-			);
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -507,7 +504,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = ImageMusicApp2;
+				PRODUCT_NAME = HosannaHymnbook;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -535,7 +532,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = ImageMusicApp2;
+				PRODUCT_NAME = HosannaHymnbook;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -709,17 +706,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		862656C429F57ED800AA1F0D /* XCRemoteSwiftPackageReference "yoga.git" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/facebook/yoga.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
 	};
 	rootObject = 83CBB9F71A601CBA00E9B192 /* Project object */;
 }

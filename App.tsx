@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import ImageScreen from './components/ImageScreen.js';
-import MusicPlayer from './components/MusicPlayer';
 import TitleList from './components/TitleList.js';
 import data from './data.js';
 
@@ -11,30 +11,34 @@ const Stack = createStackNavigator();
 
 const HomeScreen = ({ navigation }) => {
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <TitleList
         data={data}
-        onTitlePress={(title) => navigation.navigate('ImageList', { title, data })}
+        onTitlePress={(index) => navigation.navigate('ImageScreen', { index: index })}
       />
     </View>
   );
 };
 
 const App = () => {
-  const [currentMusic, setCurrentMusic] = useState(null);
-
   return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator initialRouteName="Home">
         <Stack.Screen
-          name="Image"
+          name="Home"
+          component={HomeScreen}
+            options={{ title: 'Hosanna hymnbook' }}
+        />
+        <Stack.Screen
+          name="ImageScreen"
           component={ImageScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
-      {currentMusic && <MusicPlayer music={currentMusic} />}
     </NavigationContainer>
+    </GestureHandlerRootView>
   );
 };
 
-export default App
+export default App;
