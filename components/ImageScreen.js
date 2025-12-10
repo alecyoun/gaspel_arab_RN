@@ -1,10 +1,11 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { StyleSheet, Image, Dimensions, Platform, View, Text, TouchableOpacity } from 'react-native';
 import Swiper from 'react-native-swiper';
-import { PinchGestureHandler, State } from 'react-native-gesture-handler';
+import { PinchGestureHandler, State, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/Ionicons';
 import data from '../data';
+import { FavoritesManager } from './FavoritesManager';
 // import MusicPlayer from './MusicPlayer'; // music 기능 비활성화
 
 Ionicons.loadFont().then();
@@ -16,7 +17,26 @@ const ImageScreen = ({ route, navigation }) => {
   const [scales, setScales] = useState({}); // 각 슬라이드별 스케일 상태
   const [baseScales, setBaseScales] = useState({}); // 각 슬라이드별 기본 스케일
   const [currentIndex, setCurrentIndex] = useState(index);
+  const [isFavorite, setIsFavorite] = useState(false);
   const swiperRef = useRef(null);
+
+  useEffect(() => {
+    checkFavorite();
+  }, [currentIndex]);
+
+  const checkFavorite = async () => {
+    const favorite = await FavoritesManager.isFavorite(currentIndex);
+    setIsFavorite(favorite);
+  };
+
+  const toggleFavorite = async () => {
+    if (isFavorite) {
+      await FavoritesManager.removeFavorite(currentIndex);
+    } else {
+      await FavoritesManager.addFavorite(currentIndex);
+    }
+    setIsFavorite(!isFavorite);
+  };
 
   const getScale = useCallback((slideIndex) => {
     return scales[slideIndex] || 1;
@@ -60,6 +80,17 @@ const ImageScreen = ({ route, navigation }) => {
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <Icon name="close" size={30} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.favoriteButton} 
+            onPress={toggleFavorite}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Icon 
+              name={isFavorite ? "heart" : "heart-outline"} 
+              size={30} 
+              color={isFavorite ? "#ff3b30" : "#fff"} 
+            />
           </TouchableOpacity>
         </View>
         <View style={styles.imageContainer}>
@@ -123,10 +154,16 @@ const styles = StyleSheet.create({
   header: {
     position: 'absolute',
     top: Platform.OS === 'ios' ? 50 : 20,
+    left: 20,
     right: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     zIndex: 1,
   },
   closeButton: {
+    padding: 10,
+  },
+  favoriteButton: {
     padding: 10,
   },
   imageContainer: {

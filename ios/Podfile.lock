@@ -356,6 +356,8 @@ PODS:
     - React-jsi (= 0.71.6)
     - React-logger (= 0.71.6)
     - React-perflogger (= 0.71.6)
+  - RNCAsyncStorage (2.2.0):
+    - React-Core
   - RNGestureHandler (2.9.0):
     - React-Core
   - RNScreens (3.20.0):
@@ -402,6 +404,7 @@ DEPENDENCIES:
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - React-runtimeexecutor (from `../node_modules/react-native/ReactCommon/runtimeexecutor`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
@@ -481,6 +484,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/runtimeexecutor"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  RNCAsyncStorage:
+    :path: "../node_modules/@react-native-async-storage/async-storage"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
   RNScreens:
@@ -491,7 +496,7 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  boost: 57d2868c099736d80fcd648bf211b4431e51a558
+  boost: 7dcd2de282d72e344012f7d6564d024930a6a440
   DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
   FBLazyVector: a83ceaa8a8581003a623facdb3c44f6d4f342ac5
   FBReactNativeSpec: 85eee79837cb797ab6176f0243a2b40511c09158
@@ -499,26 +504,26 @@ SPEC CHECKSUMS:
   glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
   hermes-engine: b434cea529ad0152c56c7cb6486b0c4c0b23b5de
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
-  RCT-Folly: 424b8c9a7a0b9ab2886ffe9c3b041ef628fd4fb1
+  RCT-Folly: 8dc08ca5a393b48b1c523ab6220dfdcc0fe000ad
   RCTRequired: 5c6fd63b03abb06947d348dadac51c93e3485bd8
   RCTTypeSafety: 1c66daedd66f674e39ce9f40782f0d490c78b175
   React: e11ca7cdc7aa4ddd7e6a59278b808cfe17ebbd9f
   React-callinvoker: 77a82869505c96945c074b80bbdc8df919646d51
-  React-Codegen: 9ee33090c38ab3da3c4dc029924d50fb649f0dfc
-  React-Core: 44903e47b428a491f48fd0eae54caddb2ea05ebf
-  React-CoreModules: 83d989defdfc82be1f7386f84a56b6509f54ac74
-  React-cxxreact: 058e7e6349649eae9cfcdec5854e702b26298932
-  React-hermes: ba19a405804b833c9b832c1f2061ad5038bb97f2
-  React-jsi: 3fe6f589c9cafbef85ed5a4be7c6dc8edfb4ab54
-  React-jsiexecutor: 7894956638ff3e00819dd3f9f6f4a84da38f2409
+  React-Codegen: 74db7ed6573f03316160764d8a8d051debd2e3ab
+  React-Core: 8c6dfeac8152e9dd73e0f402a9a04fb31b47e17f
+  React-CoreModules: 9cc509c41539ec9ed797c0b10bcfe38d9059f479
+  React-cxxreact: 9c4a5fb2972c1b4df4f67eaa9148c5eb8eb4e857
+  React-hermes: 76e3f8bf35a6ae613838102eb1bba55f95c6cc0b
+  React-jsi: bf39e2fa6b309769572b3fd98c419f7ccdf90216
+  React-jsiexecutor: 37cb79451c8bc557f5f589ecc1f82b3f458a6d39
   React-jsinspector: d5ce2ef3eb8fd30c28389d0bc577918c70821bd6
-  React-logger: 9332c3e7b4ef007a0211c0a9868253aac3e1da82
-  react-native-safe-area-context: 39c2d8be3328df5d437ac1700f4f3a4f75716acc
+  React-logger: fd74333c35b1da044003748800de496155805954
+  react-native-safe-area-context: 863c9695a24b9e6bb6c412f1c8ddb4dfc3ae3862
   React-perflogger: 43392072a5b867a504e2b4857606f8fc5a403d7f
   React-RCTActionSheet: c7b67c125bebeda9fb19fc7b200d85cb9d6899c4
   React-RCTAnimation: c2de79906f607986633a7114bee44854e4c7e2f5
-  React-RCTAppDelegate: 96bc933c3228a549718a6475c4d3f9dd4bbae98d
-  React-RCTBlob: cf72446957310e7da6627a4bdaadf970d3a8f232
+  React-RCTAppDelegate: 5b5f2d750b8defd625f3133e07c429c0a665105d
+  React-RCTBlob: 97056c40276e80d8b4fa7a138892247639e5b33b
   React-RCTImage: c6093f1bf3d67c0428d779b00390617d5bd90699
   React-RCTLinking: 5de47e37937889d22599af4b99d0552bad1b1c3c
   React-RCTNetwork: e7d7077e073b08e5dd486fba3fe87ccad90a9bc4
@@ -526,12 +531,13 @@ SPEC CHECKSUMS:
   React-RCTText: 7123c70fef5367e2121fea37e65b9ad6d3747e54
   React-RCTVibration: 73d201599a64ea14b4e0b8f91b64970979fd92e6
   React-runtimeexecutor: 8692ac548bec648fa121980ccb4304afd136d584
-  ReactCommon: 0c43eaeaaee231d7d8dc24fc5a6e4cf2b75bf196
-  RNGestureHandler: 071d7a9ad81e8b83fe7663b303d132406a7d8f39
-  RNScreens: 218801c16a2782546d30bd2026bb625c0302d70f
-  RNVectorIcons: fcc2f6cb32f5735b586e66d14103a74ce6ad61f8
+  ReactCommon: ff34b988cd7dda64661c9e099514f955d671e96c
+  RNCAsyncStorage: b44e8a4e798c3e1f56bffccd0f591f674fb9198f
+  RNGestureHandler: 5fe9e4f847b51d8cc9006cec6c7dc6718dd82809
+  RNScreens: c6ae949c292bee8ed7f355ab2adcfc9a51629951
+  RNVectorIcons: 5784330be9dddb5474e8b378d5f6947996c84e55
   Yoga: ba09b6b11e6139e3df8229238aa794205ca6a02a
 
-PODFILE CHECKSUM: 0216f39a01fb41c50a33c597939b71541e7c8f17
+PODFILE CHECKSUM: d69648aeca0e7dc286b37db75a4df002296e057b
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.16.2

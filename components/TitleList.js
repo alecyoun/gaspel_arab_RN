@@ -1,21 +1,73 @@
 import React from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, ScrollView, TouchableWithoutFeedback } from 'react-native';
+import { View, TouchableOpacity, Text, StyleSheet, ScrollView, TouchableWithoutFeedback, Platform } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 
-const TitleList = ({ data, onTitlePress }) => {
+const TitleList = ({ data, onTitlePress, onSearchPress, onFavoritesPress }) => {
   return (
-    <TouchableWithoutFeedback>
-      <ScrollView contentContainerStyle={styles.container}>
-        {data.map((item, index) => (
-          <TouchableOpacity key={index} onPress={() => onTitlePress(index)}>
-            <Text style={[styles.title, styles.rightAlign]}>{item.title}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-    </TouchableWithoutFeedback>
+    <View style={styles.wrapper}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Hosanna hymnbook</Text>
+        <View style={styles.headerButtons}>
+          {onFavoritesPress && (
+            <TouchableOpacity
+              onPress={onFavoritesPress}
+              style={styles.headerButton}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Icon name="heart" size={24} color="#333" />
+            </TouchableOpacity>
+          )}
+          {onSearchPress && (
+            <TouchableOpacity
+              onPress={onSearchPress}
+              style={styles.headerButton}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Icon name="search" size={24} color="#333" />
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+      <TouchableWithoutFeedback>
+        <ScrollView contentContainerStyle={styles.container}>
+          {data.map((item, index) => (
+            <TouchableOpacity key={index} onPress={() => onTitlePress(index)}>
+              <Text style={[styles.title, styles.rightAlign]}>{item.title}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  wrapper: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    paddingTop: Platform.OS === 'ios' ? 50 : 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+    backgroundColor: '#fff',
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  headerButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  headerButton: {
+    padding: 4,
+  },
   container: {
     flexGrow: 1,
     alignItems: 'flex-end',
