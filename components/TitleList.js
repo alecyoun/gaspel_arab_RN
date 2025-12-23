@@ -2,12 +2,30 @@ import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, ScrollView, TouchableWithoutFeedback, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const TitleList = ({ data, onTitlePress, onSearchPress, onFavoritesPress }) => {
+const TitleList = ({ data, onTitlePress, onSearchPress, onFavoritesPress, onSettingsPress, onStatisticsPress, onRecentViewedPress }) => {
   return (
     <View style={styles.wrapper}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Hosanna hymnbook</Text>
         <View style={styles.headerButtons}>
+          {onRecentViewedPress && (
+            <TouchableOpacity
+              onPress={onRecentViewedPress}
+              style={styles.headerButton}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Icon name="time-outline" size={24} color="#333" />
+            </TouchableOpacity>
+          )}
+          {onStatisticsPress && (
+            <TouchableOpacity
+              onPress={onStatisticsPress}
+              style={styles.headerButton}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Icon name="stats-chart" size={24} color="#333" />
+            </TouchableOpacity>
+          )}
           {onFavoritesPress && (
             <TouchableOpacity
               onPress={onFavoritesPress}
@@ -24,6 +42,15 @@ const TitleList = ({ data, onTitlePress, onSearchPress, onFavoritesPress }) => {
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
               <Icon name="search" size={24} color="#333" />
+            </TouchableOpacity>
+          )}
+          {onSettingsPress && (
+            <TouchableOpacity
+              onPress={onSettingsPress}
+              style={styles.headerButton}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Icon name="settings-outline" size={24} color="#333" />
             </TouchableOpacity>
           )}
         </View>

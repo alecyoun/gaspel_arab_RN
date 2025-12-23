@@ -7,6 +7,10 @@ import ImageScreen from './components/ImageScreen.js';
 import TitleList from './components/TitleList.js';
 import SearchScreen from './components/SearchScreen.js';
 import FavoritesScreen from './components/FavoritesScreen.js';
+import SettingsScreen from './components/SettingsScreen.js';
+import StatisticsScreen from './components/StatisticsScreen.js';
+import RecentViewedScreen from './components/RecentViewedScreen.js';
+import NoteEditorScreen from './components/NoteEditorScreen.js';
 import data from './data.js';
 
 const Stack = createStackNavigator();
@@ -22,6 +26,18 @@ const HomeScreen = ({ navigation }) => {
     navigation.navigate('Favorites');
   };
 
+  const handleSettingsPress = () => {
+    navigation.navigate('Settings');
+  };
+
+  const handleStatisticsPress = () => {
+    navigation.navigate('Statistics');
+  };
+
+  const handleRecentViewedPress = () => {
+    navigation.navigate('RecentViewed');
+  };
+
   const handleSearchItemPress = (index) => {
     navigation.navigate('ImageScreen', { index });
   };
@@ -33,6 +49,9 @@ const HomeScreen = ({ navigation }) => {
         onTitlePress={(index) => navigation.navigate('ImageScreen', { index: index })}
         onSearchPress={handleSearchPress}
         onFavoritesPress={handleFavoritesPress}
+        onSettingsPress={handleSettingsPress}
+        onStatisticsPress={handleStatisticsPress}
+        onRecentViewedPress={handleRecentViewedPress}
       />
       <SearchScreen
         visible={searchVisible}
@@ -65,6 +84,38 @@ const App = () => {
         <Stack.Screen
           name="Favorites"
           component={FavoritesScreen}
+          options={{ 
+            headerShown: false,
+            presentation: 'modal'
+          }}
+        />
+        <Stack.Screen
+          name="Settings"
+          component={SettingsScreen}
+          options={{ 
+            headerShown: false,
+            presentation: 'modal'
+          }}
+        />
+        <Stack.Screen
+          name="Statistics"
+          component={StatisticsScreen}
+          options={{ 
+            headerShown: false,
+            presentation: 'modal'
+          }}
+        />
+        <Stack.Screen
+          name="RecentViewed"
+          component={RecentViewedScreen}
+          options={{ 
+            headerShown: false,
+            presentation: 'modal'
+          }}
+        />
+        <Stack.Screen
+          name="NoteEditor"
+          component={NoteEditorScreen}
           options={{ 
             headerShown: false,
             presentation: 'modal'

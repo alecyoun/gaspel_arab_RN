@@ -1,11 +1,12 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { StyleSheet, Image, Dimensions, Platform, View, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, Image, Dimensions, Platform, View, Text, TouchableOpacity, Share, Alert } from 'react-native';
 import Swiper from 'react-native-swiper';
 import { PinchGestureHandler, State, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/Ionicons';
 import data from '../data';
 import { FavoritesManager } from './FavoritesManager';
+import { ViewedManager, NotesManager, BookmarksManager } from './SettingsManager';
 // import MusicPlayer from './MusicPlayer'; // music 기능 비활성화
 
 Ionicons.loadFont().then();
@@ -17,16 +18,45 @@ const ImageScreen = ({ route, navigation }) => {
   const [scales, setScales] = useState({}); // 각 슬라이드별 스케일 상태
   const [baseScales, setBaseScales] = useState({}); // 각 슬라이드별 기본 스케일
   const [currentIndex, setCurrentIndex] = useState(index);
+  const [currentPage, setCurrentPage] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [hasNote, setHasNote] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
   const swiperRef = useRef(null);
 
   useEffect(() => {
     checkFavorite();
+    checkNote();
+    checkBookmark();
+    // 최근 본 항목에 추가
+    ViewedManager.addViewed(currentIndex);
   }, [currentIndex]);
+
+  useEffect(() => {
+    // NoteEditor에서 돌아왔을 때 메모 상태 업데이트
+    const unsubscribe = navigation.addListener('focus', () => {
+      checkNote();
+    });
+    return unsubscribe;
+  }, [navigation]);
+
+  useEffect(() => {
+    checkBookmark();
+  }, [currentPage, currentIndex]);
 
   const checkFavorite = async () => {
     const favorite = await FavoritesManager.isFavorite(currentIndex);
     setIsFavorite(favorite);
+  };
+
+  const checkNote = async () => {
+    const note = await NotesManager.getNote(currentIndex);
+    setHasNote(note.length > 0);
+  };
+
+  const checkBookmark = async () => {
+    const bookmarked = await BookmarksManager.isBookmarked(currentIndex, currentPage);
+    setIsBookmarked(bookmarked);
   };
 
   const toggleFavorite = async () => {
@@ -36,6 +66,31 @@ const ImageScreen = ({ route, navigation }) => {
       await FavoritesManager.addFavorite(currentIndex);
     }
     setIsFavorite(!isFavorite);
+  };
+
+  const handleShare = async () => {
+    try {
+      const currentItem = data[currentIndex];
+      await Share.share({
+        message: `${currentItem.title}\n\nHosanna Hymnbook`,
+        title: currentItem.title,
+      });
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  };
+
+  const handleNote = () => {
+    navigation.navigate('NoteEditor', { index: currentIndex });
+  };
+
+  const toggleBookmark = async () => {
+    if (isBookmarked) {
+      await BookmarksManager.removeBookmark(currentIndex, currentPage);
+    } else {
+      await BookmarksManager.addBookmark(currentIndex, currentPage);
+    }
+    setIsBookmarked(!isBookmarked);
   };
 
   const getScale = useCallback((slideIndex) => {
@@ -67,6 +122,11 @@ const ImageScreen = ({ route, navigation }) => {
 
   const onIndexChanged = (newIndex) => {
     setCurrentIndex(newIndex);
+    setCurrentPage(0);
+  };
+
+  const onPageChanged = (page) => {
+    setCurrentPage(page);
   };
 
   const currentItem = data[currentIndex];
@@ -81,17 +141,48 @@ const ImageScreen = ({ route, navigation }) => {
           >
             <Icon name="close" size={30} color="#fff" />
           </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.favoriteButton} 
-            onPress={toggleFavorite}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <Icon 
-              name={isFavorite ? "heart" : "heart-outline"} 
-              size={30} 
-              color={isFavorite ? "#ff3b30" : "#fff"} 
-            />
-          </TouchableOpacity>
+          <View style={styles.headerRight}>
+            <TouchableOpacity 
+              style={styles.headerButton} 
+              onPress={handleShare}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Icon name="share-outline" size={28} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.headerButton} 
+              onPress={handleNote}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Icon 
+                name={hasNote ? "document-text" : "document-text-outline"} 
+                size={28} 
+                color={hasNote ? "#ff9500" : "#fff"} 
+              />
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.headerButton} 
+              onPress={toggleBookmark}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Icon 
+                name={isBookmarked ? "bookmark" : "bookmark-outline"} 
+                size={28} 
+                color={isBookmarked ? "#af52de" : "#fff"} 
+              />
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.headerButton} 
+              onPress={toggleFavorite}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Icon 
+                name={isFavorite ? "heart" : "heart-outline"} 
+                size={28} 
+                color={isFavorite ? "#ff3b30" : "#fff"} 
+              />
+            </TouchableOpacity>
+          </View>
         </View>
         <View style={styles.imageContainer}>
           <Swiper
@@ -100,6 +191,7 @@ const ImageScreen = ({ route, navigation }) => {
             loop={false}
             index={index}
             onIndexChanged={onIndexChanged}
+            onMomentumScrollEnd={(e, state) => onPageChanged(state.index)}
             containerStyle={styles.swiperContainer}
             removeClippedSubviews={Platform.OS === 'ios'}
             loadMinimal
@@ -162,6 +254,14 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: 10,
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  headerButton: {
+    padding: 8,
   },
   favoriteButton: {
     padding: 10,
