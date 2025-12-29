@@ -1,13 +1,21 @@
 import React from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, ScrollView, TouchableWithoutFeedback, Platform } from 'react-native';
+import { View, TouchableOpacity, Text, StyleSheet, ScrollView, TouchableWithoutFeedback, Platform, Share } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const TitleList = ({ data, onTitlePress, onSearchPress, onFavoritesPress, onSettingsPress, onStatisticsPress, onRecentViewedPress }) => {
+const TitleList = ({ data, onTitlePress, onSearchPress, onFavoritesPress, onSettingsPress, onStatisticsPress, onRecentViewedPress, onSharePress }) => {
   return (
     <View style={styles.wrapper}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Hosanna hymnbook</Text>
         <View style={styles.headerButtons}>
+          {onSharePress && (
+            <TouchableOpacity
+              onPress={onSharePress}
+              style={styles.headerButton}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Icon name="share-social-outline" size={24} color="#333" />
+            </TouchableOpacity>
+          )}
           {onRecentViewedPress && (
             <TouchableOpacity
               onPress={onRecentViewedPress}
@@ -74,7 +82,7 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,

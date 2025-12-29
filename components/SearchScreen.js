@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,34 +8,109 @@ import {
   TouchableOpacity,
   Modal,
   Platform,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import Voice from '@react-native-voice/voice';
 import { RecentManager } from './FavoritesManager';
 
 const SearchScreen = ({ visible, onClose, data, onItemPress }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [recentSearches, setRecentSearches] = useState([]);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isAvailable, setIsAvailable] = useState(false);
 
   useEffect(() => {
     if (visible) {
       loadRecentSearches();
+      checkVoiceAvailability();
     }
+    return () => {
+      Voice.destroy().then(Voice.removeAllListeners);
+    };
   }, [visible]);
+
+  useEffect(() => {
+    Voice.onSpeechStart = () => {
+      setIsRecording(true);
+    };
+    Voice.onSpeechEnd = () => {
+      setIsRecording(false);
+    };
+    Voice.onSpeechError = (e) => {
+      setIsRecording(false);
+      console.error('Speech recognition error:', e);
+      if (e.error?.code !== '7') { // 7은 사용자가 취소한 경우
+        Alert.alert('오류', '음성 인식 중 오류가 발생했습니다.');
+      }
+    };
+    Voice.onSpeechResults = (e) => {
+      if (e.value && e.value.length > 0) {
+        setSearchQuery(e.value[0]);
+      }
+      setIsRecording(false);
+    };
+
+    return () => {
+      Voice.destroy().then(Voice.removeAllListeners);
+    };
+  }, []);
+
+  const checkVoiceAvailability = async () => {
+    try {
+      const available = await Voice.isAvailable();
+      setIsAvailable(available);
+    } catch (error) {
+      console.error('Error checking voice availability:', error);
+      setIsAvailable(false);
+    }
+  };
+
+  const startVoiceSearch = async () => {
+    try {
+      await Voice.start('ar-SA'); // 아랍어(사우디아라비아)로 설정
+    } catch (error) {
+      console.error('Error starting voice recognition:', error);
+      Alert.alert('오류', '음성 인식을 시작할 수 없습니다. 마이크 권한을 확인해주세요.');
+    }
+  };
+
+  const stopVoiceSearch = async () => {
+    try {
+      await Voice.stop();
+      setIsRecording(false);
+    } catch (error) {
+      console.error('Error stopping voice recognition:', error);
+    }
+  };
 
   const loadRecentSearches = async () => {
     const recent = await RecentManager.getRecent(10);
     setRecentSearches(recent);
   };
 
+  // 아랍어 검색을 위한 정규화 함수
+  const normalizeText = (text) => {
+    if (!text) return '';
+    // 아랍어 문자 정규화 (다양한 형태의 같은 문자를 통일)
+    return text
+      .normalize('NFD')
+      .replace(/[\u064B-\u065F\u0670]/g, '') // 아랍어 발음 기호 제거
+      .replace(/[\u0640]/g, '') // 타트윌 제거
+      .toLowerCase();
+  };
+
   const filteredData = useMemo(() => {
     if (!searchQuery.trim()) {
       return [];
     }
+    const normalizedQuery = normalizeText(searchQuery);
     return data
       .map((item, index) => ({ ...item, index }))
-      .filter((item) =>
-        item.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      .filter((item) => {
+        const normalizedTitle = normalizeText(item.title);
+        return normalizedTitle.includes(normalizedQuery);
+      });
   }, [searchQuery, data]);
 
   const handleItemPress = async (index) => {
@@ -87,6 +162,18 @@ const SearchScreen = ({ visible, onClose, data, onItemPress }) => {
               style={styles.clearButton}
             >
               <Icon name="close-circle" size={20} color="#999" />
+            </TouchableOpacity>
+          )}
+          {isAvailable && (
+            <TouchableOpacity
+              onPress={isRecording ? stopVoiceSearch : startVoiceSearch}
+              style={styles.micButton}
+            >
+              <Icon 
+                name={isRecording ? "mic" : "mic-outline"} 
+                size={20} 
+                color={isRecording ? "#ff3b30" : "#999"} 
+              />
             </TouchableOpacity>
           )}
         </View>
@@ -213,6 +300,10 @@ const styles = StyleSheet.create({
   },
   clearButton: {
     padding: 4,
+  },
+  micButton: {
+    padding: 4,
+    marginLeft: 4,
   },
   resultsContainer: {
     flex: 1,

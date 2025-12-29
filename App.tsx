@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View } from 'react-native';
+import { View, Share } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -42,6 +42,17 @@ const HomeScreen = ({ navigation }) => {
     navigation.navigate('ImageScreen', { index });
   };
 
+  const handleSharePress = async () => {
+    try {
+      await Share.share({
+        message: 'Hosanna Hymnbook - 찬송가 앱을 확인해보세요!',
+        title: 'Hosanna Hymnbook',
+      });
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <TitleList
@@ -52,6 +63,7 @@ const HomeScreen = ({ navigation }) => {
         onSettingsPress={handleSettingsPress}
         onStatisticsPress={handleStatisticsPress}
         onRecentViewedPress={handleRecentViewedPress}
+        onSharePress={handleSharePress}
       />
       <SearchScreen
         visible={searchVisible}
