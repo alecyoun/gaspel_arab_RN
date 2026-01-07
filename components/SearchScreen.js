@@ -19,6 +19,7 @@ const SearchScreen = ({ visible, onClose, data, onItemPress }) => {
   const [recentSearches, setRecentSearches] = useState([]);
   const [isRecording, setIsRecording] = useState(false);
   const [isAvailable, setIsAvailable] = useState(false);
+  const [forceUpdate, setForceUpdate] = useState(0);
 
   useEffect(() => {
     if (visible) {
@@ -29,6 +30,10 @@ const SearchScreen = ({ visible, onClose, data, onItemPress }) => {
       Voice.destroy().then(Voice.removeAllListeners);
     };
   }, [visible]);
+
+  // searchQuery가 변경될 때마다 검색 결과가 자동으로 업데이트되도록 보장
+  // filteredData는 useMemo로 searchQuery에 의존하므로 자동으로 재계산됨
+  // handleSearchTextChange에서 이미 forceUpdate를 트리거하므로 여기서는 추가 작업 불필요
 
   useEffect(() => {
     Voice.onSpeechStart = () => {
@@ -46,7 +51,15 @@ const SearchScreen = ({ visible, onClose, data, onItemPress }) => {
     };
     Voice.onSpeechResults = (e) => {
       if (e.value && e.value.length > 0) {
-        setSearchQuery(e.value[0]);
+        const rawText = e.value[0];
+        console.log('음성 인식 원본 결과:', rawText);
+        // 음성 인식 결과 정리 (RTL 마커 등 제거)
+        const cleanedText = cleanVoiceInput(rawText);
+        console.log('정리된 음성 인식 결과:', cleanedText);
+        // 음성 인식 완료 후 검색 쿼리 설정
+        // handleSearchTextChange를 사용하여 키보드 입력과 동일한 방식으로 검색 실행
+        handleSearchTextChange(cleanedText);
+        console.log('검색 쿼리 설정 및 검색 실행됨:', cleanedText);
       }
       setIsRecording(false);
     };
@@ -89,6 +102,30 @@ const SearchScreen = ({ visible, onClose, data, onItemPress }) => {
     setRecentSearches(recent);
   };
 
+  // 검색 텍스트 변경 핸들러 (키보드 입력과 음성 인식 모두에서 사용)
+  const handleSearchTextChange = (text) => {
+    setSearchQuery(text);
+    // 검색 쿼리가 변경되면 filteredData가 자동으로 재계산됨
+    // 강제로 리렌더링을 트리거하여 검색 결과가 표시되도록 함
+    setForceUpdate(prev => prev + 1);
+  };
+
+  // 음성 인식 결과 정리 함수 (RTL 마커, 보이지 않는 문자 제거)
+  const cleanVoiceInput = (text) => {
+    if (!text) return '';
+    return text
+      .replace(/[\u200E\u200F\u202A-\u202E]/g, '') // RTL/LTR 마커 제거
+      .replace(/[\uFEFF]/g, '') // Zero-width no-break space 제거
+      .trim();
+  };
+
+  // 제목에서 숫자 추출 함수
+  const extractNumber = (text) => {
+    if (!text) return null;
+    const match = text.match(/^(\d+)/);
+    return match ? parseInt(match[1], 10) : null;
+  };
+
   // 아랍어 검색을 위한 정규화 함수
   const normalizeText = (text) => {
     if (!text) return '';
@@ -97,21 +134,43 @@ const SearchScreen = ({ visible, onClose, data, onItemPress }) => {
       .normalize('NFD')
       .replace(/[\u064B-\u065F\u0670]/g, '') // 아랍어 발음 기호 제거
       .replace(/[\u0640]/g, '') // 타트윌 제거
+      .replace(/[\u200E\u200F\u202A-\u202E]/g, '') // RTL/LTR 마커 제거
+      .replace(/[\uFEFF]/g, '') // Zero-width no-break space 제거
       .toLowerCase();
   };
 
   const filteredData = useMemo(() => {
-    if (!searchQuery.trim()) {
+    if (!searchQuery || !searchQuery.trim()) {
       return [];
     }
-    const normalizedQuery = normalizeText(searchQuery);
-    return data
+    const query = searchQuery.trim();
+    const cleanedQuery = cleanVoiceInput(query);
+    const normalizedQuery = normalizeText(cleanedQuery);
+    
+    // 숫자 검색을 위한 숫자 추출
+    const queryNumber = extractNumber(cleanedQuery);
+    
+    console.log('검색 실행 - 쿼리:', cleanedQuery, '정규화된 쿼리:', normalizedQuery, '추출된 숫자:', queryNumber);
+    
+    const results = data
       .map((item, index) => ({ ...item, index }))
       .filter((item) => {
+        // 숫자 검색: 쿼리가 숫자로 시작하면 제목의 숫자와 비교
+        if (queryNumber !== null) {
+          const titleNumber = extractNumber(item.title);
+          if (titleNumber === queryNumber) {
+            return true;
+          }
+        }
+        
+        // 텍스트 검색: 정규화된 검색 또는 원본 검색으로 매칭
         const normalizedTitle = normalizeText(item.title);
-        return normalizedTitle.includes(normalizedQuery);
+        const matches = normalizedTitle.includes(normalizedQuery) || item.title.includes(cleanedQuery);
+        return matches;
       });
-  }, [searchQuery, data]);
+    console.log('검색 결과 개수:', results.length);
+    return results;
+  }, [searchQuery, data, forceUpdate]);
 
   const handleItemPress = async (index) => {
     // 최근 검색 기록에 추가
@@ -152,7 +211,7 @@ const SearchScreen = ({ visible, onClose, data, onItemPress }) => {
             placeholder="البحث عن عنوان الترتيلة..."
             placeholderTextColor="#999"
             value={searchQuery}
-            onChangeText={setSearchQuery}
+            onChangeText={handleSearchTextChange}
             autoFocus
             returnKeyType="search"
           />
