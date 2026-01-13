@@ -3,6 +3,7 @@ import { View, Share } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import ImageScreen from './components/ImageScreen.js';
 import TitleList from './components/TitleList.js';
 import SearchScreen from './components/SearchScreen.js';
@@ -77,6 +78,7 @@ const HomeScreen = ({ navigation }) => {
 
 const App = () => {
   return (
+    <SafeAreaProvider>
     <GestureHandlerRootView style={{ flex: 1 }}>
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
@@ -136,6 +138,7 @@ const App = () => {
       </Stack.Navigator>
     </NavigationContainer>
     </GestureHandlerRootView>
+    </SafeAreaProvider>
   );
 };
 

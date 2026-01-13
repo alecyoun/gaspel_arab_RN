@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { StyleSheet, Image, Dimensions, Platform, View, Text, TouchableOpacity, Share, Alert } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Swiper from 'react-native-swiper';
 import { PinchGestureHandler, State, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -13,8 +14,12 @@ Ionicons.loadFont().then();
 
 const { width, height } = Dimensions.get('window');
 
+// 기기 타입 감지 (iPhone vs iPad)
+const isTablet = width >= 768;
+
 const ImageScreen = ({ route, navigation }) => {
   const { index } = route.params;
+  const insets = useSafeAreaInsets();
   const [scales, setScales] = useState({}); // 각 슬라이드별 스케일 상태
   const [baseScales, setBaseScales] = useState({}); // 각 슬라이드별 기본 스케일
   const [currentIndex, setCurrentIndex] = useState(index);
@@ -23,6 +28,13 @@ const ImageScreen = ({ route, navigation }) => {
   const [hasNote, setHasNote] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const swiperRef = useRef(null);
+  
+  // SafeArea top 값 계산 (fallback 포함) - iPhone과 iPad 모두 지원
+  // insets.top이 0이거나 undefined일 경우 기기 타입에 따라 기본값 사용
+  const defaultTop = Platform.OS === 'ios' ? (isTablet ? 20 : 50) : 20;
+  const safeAreaTop = (insets && typeof insets.top === 'number' && insets.top > 0) 
+    ? insets.top 
+    : defaultTop;
 
   useEffect(() => {
     checkFavorite();
@@ -133,13 +145,13 @@ const ImageScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-        <View style={styles.header}>
+        <View style={[styles.header, { top: safeAreaTop }]}>
           <TouchableOpacity 
-            style={styles.closeButton} 
+            style={[styles.closeButton, styles.backButtonWithBackground]} 
             onPress={() => navigation.goBack()}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
           >
-            <Icon name="close" size={30} color="#fff" />
+            <Icon name="arrow-back" size={28} color="#fff" />
           </TouchableOpacity>
           <View style={styles.headerRight}>
             <TouchableOpacity 
@@ -245,15 +257,29 @@ const styles = StyleSheet.create({
   },
   header: {
     position: 'absolute',
-    top: Platform.OS === 'ios' ? 50 : 20,
-    left: 20,
-    right: 20,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    zIndex: 1,
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    zIndex: 1000,
   },
   closeButton: {
     padding: 10,
+  },
+  backButtonWithBackground: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 20,
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   headerRight: {
     flexDirection: 'row',

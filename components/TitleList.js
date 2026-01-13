@@ -1,11 +1,20 @@
 import React from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, ScrollView, TouchableWithoutFeedback, Platform, Share } from 'react-native';
+import { View, TouchableOpacity, Text, StyleSheet, ScrollView, TouchableWithoutFeedback, Platform, Share, Dimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 
+const { width } = Dimensions.get('window');
+const isTablet = width >= 768;
+
 const TitleList = ({ data, onTitlePress, onSearchPress, onFavoritesPress, onSettingsPress, onStatisticsPress, onRecentViewedPress, onSharePress }) => {
+  const insets = useSafeAreaInsets();
+  const safeAreaTop = (insets && typeof insets.top === 'number' && insets.top > 0) 
+    ? insets.top 
+    : (Platform.OS === 'ios' ? (isTablet ? 20 : 50) : 20);
+  
   return (
     <View style={styles.wrapper}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: safeAreaTop }]}>
         <View style={styles.headerButtons}>
           {onSharePress && (
             <TouchableOpacity
@@ -63,15 +72,21 @@ const TitleList = ({ data, onTitlePress, onSearchPress, onFavoritesPress, onSett
           )}
         </View>
       </View>
-      <TouchableWithoutFeedback>
-        <ScrollView contentContainerStyle={styles.container}>
-          {data.map((item, index) => (
-            <TouchableOpacity key={index} onPress={() => onTitlePress(index)}>
-              <Text style={[styles.title, styles.rightAlign]}>{item.title}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </TouchableWithoutFeedback>
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.container}
+        showsVerticalScrollIndicator={true}
+      >
+        {data.map((item, index) => (
+          <TouchableOpacity 
+            key={index} 
+            onPress={() => onTitlePress(index)}
+            style={styles.titleContainer}
+          >
+            <Text style={styles.title}>{item.title}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
     </View>
   );
 };
@@ -84,9 +99,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    paddingTop: Platform.OS === 'ios' ? 50 : 20,
+    paddingHorizontal: isTablet ? 24 : 16,
+    paddingVertical: isTablet ? 16 : 12,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
     backgroundColor: '#fff',
@@ -103,17 +117,27 @@ const styles = StyleSheet.create({
   headerButton: {
     padding: 4,
   },
+  scrollView: {
+    flex: 1,
+  },
   container: {
     flexGrow: 1,
-    alignItems: 'flex-end',
-    justifyContent: 'flex-end',
-    padding: 10,
+    padding: isTablet ? 20 : 10,
+    paddingBottom: isTablet ? 40 : 20,
+  },
+  titleContainer: {
+    width: '100%',
+    paddingVertical: isTablet ? 12 : 8,
+    paddingHorizontal: isTablet ? 20 : 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
   },
   title: {
-    fontSize: 20,
+    fontSize: isTablet ? 24 : 20,
     fontWeight: 'bold',
-    marginBottom: 10,
     textAlign: 'right',
+    color: '#333',
+    writingDirection: 'rtl',
   },
 });
 
