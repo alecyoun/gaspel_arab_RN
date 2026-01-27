@@ -12,14 +12,10 @@ import { ViewedManager, NotesManager, BookmarksManager } from './SettingsManager
 
 Ionicons.loadFont().then();
 
-const { width, height } = Dimensions.get('window');
-
-// 기기 타입 감지 (iPhone vs iPad)
-const isTablet = width >= 768;
-
 const ImageScreen = ({ route, navigation }) => {
   const { index } = route.params;
   const insets = useSafeAreaInsets();
+  const [dimensions, setDimensions] = useState(Dimensions.get('window'));
   const [scales, setScales] = useState({}); // 각 슬라이드별 스케일 상태
   const [baseScales, setBaseScales] = useState({}); // 각 슬라이드별 기본 스케일
   const [currentIndex, setCurrentIndex] = useState(index);
@@ -28,6 +24,25 @@ const ImageScreen = ({ route, navigation }) => {
   const [hasNote, setHasNote] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const swiperRef = useRef(null);
+  
+  // 화면 회전 감지
+  useEffect(() => {
+    const subscription = Dimensions.addEventListener('change', ({ window }) => {
+      setDimensions(window);
+      // 화면 회전 시 스케일 초기화 (선택사항)
+      setScales({});
+      setBaseScales({});
+    });
+    
+    return () => {
+      subscription?.remove();
+    };
+  }, []);
+  
+  const { width, height } = dimensions;
+  
+  // 기기 타입 감지 (iPhone vs iPad)
+  const isTablet = width >= 768;
   
   // SafeArea top 값 계산 (fallback 포함) - iPhone과 iPad 모두 지원
   // insets.top이 0이거나 undefined일 경우 기기 타입에 따라 기본값 사용
@@ -222,12 +237,14 @@ const ImageScreen = ({ route, navigation }) => {
                   avgTouches
                 >
                   <View style={styles.slide}>
-                    <View style={styles.imageWrapper}>
+                    <View style={[styles.imageWrapper, { width, height }]}>
                       <Image
                         source={item.image}
                         style={[
                           styles.image,
                           {
+                            width,
+                            height,
                             transform: [{ scale: scale }],
                           }
                         ]}
@@ -305,14 +322,11 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   imageWrapper: {
-    width: width,
-    height: height,
     justifyContent: 'center',
     alignItems: 'center',
   },
   image: {
-    width: width,
-    height: height,
+    // width와 height는 동적으로 설정됨
   },
   bottom: {
     position: 'absolute',
